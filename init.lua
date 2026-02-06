@@ -768,6 +768,8 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+	bash = { "shfmt" },
+	sh = { "shfmt" },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -964,6 +966,35 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
 
+  {
+  "folke/flash.nvim",
+  event = "VeryLazy",
+  ---@type Flash.Config
+  opts = {},
+  keys = {
+    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+    { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+    { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+    { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+  },
+},
+{
+  "mfussenegger/nvim-lint",
+  event = { "BufReadPost", "BufNewFile" },
+  config = function()
+    require('lint').linters_by_ft = {
+      sh = {'shellcheck'},
+      bash = {'shellcheck'},
+    }
+    -- 保存时自动运行检查
+    vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+      callback = function()
+        require("lint").try_lint()
+      end,
+    })
+  end,
+},
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
